@@ -26,5 +26,18 @@ namespace AngularTestApp.Controllers
 
             return View();
         }
+
+        public ActionResult Countries()
+        {
+            var countriesDictionary = new Dictionary<string, string>
+            {
+                { "1", "US" },
+                { "2", "UK" },
+                { "3", "Germany" },
+                { "4", "Australia" },
+                { "5", "Switzerland" },
+            };
+            return Json(countriesDictionary);
+        }
     }
 }

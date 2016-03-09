@@ -2,30 +2,85 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+<script>
+    var myApp = angular.module('documentsApp', []);
+    myApp.controller('DocumentsController', function ($http, $scope) {
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+        $scope.newItem = { id: 0, countryId: '1' };
+        $scope.items = [];
+        $scope.countries = {};
+
+        $scope.save = function (item) {
+            console.log('Saving item:');
+            console.log(item);
+            $scope.items.push(item);
+        };
+        $scope.load = function () {
+            $scope.items = [
+                { id: 1, title: "A new approach to investing", countryId: 1 }
+            ];
+            $scope.countries = {
+                '1': 'US',
+                '2': 'UK',
+                '3': 'Germany',
+                '4': 'Australia'
+            };
+        };
+
+        $http.post('/Home/Countries', function (data) {
+
+        });
+
+        // initialize on first page load
+        $scope.load();
+    });
+</script>
+
+<br />
+<br />
+<br />
+<br />
+
+<div ng-app="documentsApp">
+    <div ng-controller="DocumentsController">
+
+        <h2>Documents</h2>
+
+        <!-- Step 1: Table of items -->
+        <table ng-show="items.length > 0" class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Title</th>
+                    <th>Country</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="d in items">
+                    <td>{{d.id}}</td>
+                    <td>{{d.title}}</td>
+                    <td>{{countries[d.countryId]}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Step 2: Add form -->
+        <form ng-submit="save(newItem)">
+            <h3>Add Document</h3>
+
+            <div>Title</div>
+            <div>
+                <input type="text" ng-model="newItem.title" />
+            </div>
+
+            <div>Country</div>
+            <div>
+                <select ng-model="newItem.countryId" ng-options="k as v for (k,v) in countries"></select>
+            </div>
+
+            <button type="submit">Save</button>
+        </form>
+
     </div>
 </div>
