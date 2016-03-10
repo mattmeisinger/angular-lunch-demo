@@ -2,23 +2,18 @@
     ViewBag.Title = "Home Page";
 }
 
+@* Reference to AngularJS library -- this usually goes in the /Views/Shared/_Layout.cshtml razor template *@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 <script>
     var myApp = angular.module('documentsApp', []);
     myApp.controller('DocumentsController', function ($http, $scope) {
 
-        $scope.newItem = { id: 0, countryId: '1' };
         $scope.items = [];
         $scope.countries = {};
 
-        $scope.save = function (item) {
-            console.log('Saving item:');
-            console.log(item);
-            $scope.items.push(item);
-        };
         $scope.load = function () {
             $scope.items = [
-                { id: 1, title: "A new approach to investing", countryId: 1 }
+                { Id: 1, Title: "A new approach to investing", CountryId: 1 }
             ];
             $scope.countries = {
                 '1': 'US',
@@ -26,21 +21,41 @@
                 '3': 'Germany',
                 '4': 'Australia'
             };
+
+            $http.post('/Documents/Get')
+                .success(function successCallback(data) {
+                    $scope.items = data;
+                });
+
+            $http.post('/Countries/Get')
+                .success(function successCallback(data) {
+                    $scope.countries = data;
+                });
+        };
+        $scope.load(); // get list on initial page load
+
+
+
+        // Save new item from form
+        $scope.save = function (item) {
+            console.log('Saving item:');
+            console.log(item);
+
+            //$scope.items.push(item);
+            $http.post('/Documents/Save', item)
+                .then(function successCallback(data) {
+                    $scope.resetItem();
+                    $scope.load();
+                });
         };
 
-        $http.post('/Home/Countries', function (data) {
-
-        });
-
-        // initialize on first page load
-        $scope.load();
+        // Set up new item in form 
+        $scope.resetItem = function() {
+            $scope.newItem = { Id: 0, CountryId: '1' };
+        }
+        $scope.resetItem(); // initialize new item on page load
     });
 </script>
-
-<br />
-<br />
-<br />
-<br />
 
 <div ng-app="documentsApp">
     <div ng-controller="DocumentsController">
@@ -58,9 +73,9 @@
             </thead>
             <tbody>
                 <tr ng-repeat="d in items">
-                    <td>{{d.id}}</td>
-                    <td>{{d.title}}</td>
-                    <td>{{countries[d.countryId]}}</td>
+                    <td>{{d.Id}}</td>
+                    <td>{{d.Title}}</td>
+                    <td>{{countries[d.CountryId]}}</td>
                 </tr>
             </tbody>
         </table>
@@ -71,15 +86,15 @@
 
             <div>Title</div>
             <div>
-                <input type="text" ng-model="newItem.title" />
+                <input type="text" ng-model="newItem.Title" />
             </div>
 
             <div>Country</div>
             <div>
-                <select ng-model="newItem.countryId" ng-options="k as v for (k,v) in countries"></select>
+                <select ng-model="newItem.CountryId" ng-options="k as v for (k,v) in countries"></select>
             </div>
 
-            <button type="submit">Save</button>
+            <button class="btn btn-primary" type="submit">Save</button>
         </form>
 
     </div>
